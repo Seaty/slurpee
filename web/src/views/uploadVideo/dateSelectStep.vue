@@ -1,5 +1,5 @@
 <template>
-  <vx-card :title="$t('datetime_setting')">
+  <vx-card :title="$t('datetime_setting', { value: selectData.g_id })">
     <div class="flex vx-row mt-2">
       <div class="vx-col w-full">
         <h5>{{ $t("select_date") }}</h5>
@@ -100,15 +100,26 @@
       </div>
     </template>
 
-    <div class="flex flex-wrap">
-      <vs-button
-        class="mt-4 shadow-lg"
-        color="#bfbfbf"
-        type="filled"
-        @click.native="previousState"
-        >{{ dataState == 0 ? $t("cancel") : $t("back") }}
-      </vs-button>
-      &nbsp;
+    <div class="flex flex-wrap justify-between">
+      <span>
+        <vs-button
+          class="mt-4 shadow-lg"
+          color="#bfbfbf"
+          type="filled"
+          @click.native="backToMain"
+          >{{ $t("cancel") }}
+        </vs-button>
+        &nbsp;
+        <vs-button
+          v-if="dataState > 0"
+          class="mt-4 shadow-lg"
+          color="#c6e2ff"
+          type="filled"
+          @click.native="previousState"
+          >{{ $t("back") }}
+        </vs-button>
+      </span>
+
       <vs-button
         class="mt-4 shadow-lg"
         color="success"
@@ -183,7 +194,12 @@ export default {
       this.$set(this.configFromdateTimePicker, "maxDate", dateStr);
     },
     onTimefromChange(value1, value2) {
-      this.$set(this.configTimeTo, "minTime", value2);
+      if (!this.fromTime) {
+        this.fromTime = "12:00";
+        this.$set(this.configTimeTo, "minTime", "12:00");
+      } else {
+        this.$set(this.configTimeTo, "minTime", value2);
+      }
     },
     onTimetoChange(value1, value2) {
       this.$set(this.configTimeFrom, "maxTime", value2);
@@ -197,6 +213,16 @@ export default {
     },
     addTimeitem() {
       let item = { time_from: this.fromTime, time_to: this.toTime };
+      let checkDup = this.tempTimeSetting.timeData.filter(
+        (x) => x.time_from == this.fromTime && x.time_to == this.toTime
+      );
+      if (checkDup.length > 0) {
+        return this.$swal({
+          icon: "warning",
+          title: this.$t("time_duplicated"),
+          confirmButtonText: this.$t("confirm"),
+        });
+      }
       this.tempTimeSetting.timeData.push(item);
       this.fromTime = null;
       this.toTime = null;
@@ -206,11 +232,26 @@ export default {
     deleteTime(index) {
       this.tempTimeSetting.timeData.splice(index, 1);
     },
-    nextState() {
+    async nextState() {
       if (this.dataState == 1) {
         this.nextStep();
       } else {
-        this.dataState++;
+        this.$store.dispatch("openLoading");
+        let r1 = await this.getMethod("/get_ads_data", {
+          g_id: this.selectData.g_id,
+          start_date: this.tempTimeSetting.fromDate,
+          end_date: this.tempTimeSetting.toDate,
+        });
+        this.$store.dispatch("closeLoading");
+        if (!r1.code) {
+          this.tempTimeSetting.timeData = r1.data;
+          this.dataState++;
+        } else {
+          this.$swal({
+            icon: "error",
+            title: this.$t("error"),
+          });
+        }
       }
     },
   },

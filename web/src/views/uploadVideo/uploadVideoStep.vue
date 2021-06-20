@@ -1,5 +1,19 @@
 <template>
-  <vx-card :title="$t('video_setting')">
+  <vx-card :title="$t('video_setting', { value: selectData.g_id })">
+    <vs-popup
+      :title="
+        $t('sample_video', { value: showVideo ? showVideo.filename : '' })
+      "
+      :active.sync="sampleModal"
+    >
+      <div class="vx-row">
+        <div class="vx-col w-full" v-if="sampleModal">
+          <video width="100%" height="auto" controls>
+            <source :src="host + 'load_video_by_var2/' + showVideo.v_id" />
+          </video>
+        </div>
+      </div>
+    </vs-popup>
     <div class="flex vx-row mt-2">
       <div class="vx-col w-full">
         <h5>{{ $t("upload_section") }}</h5>
@@ -83,7 +97,12 @@
               <span>{{ $t("video_selected") }}</span>
             </div>
             <div class="vx-col md:w-1/3">
-              <v-select multiple v-model="selectedVideo" :options="videoList" />
+              <v-select
+                multiple
+                label="filename"
+                v-model="selectedVideo"
+                :options="videoList"
+              />
             </div>
           </div>
         </div>
@@ -93,7 +112,7 @@
             <template slot="thead">
               <vs-th>#</vs-th>
               <vs-th>{{ $t("filename") }}</vs-th>
-              <vs-th>{{ $t("delete") }}</vs-th>
+              <vs-th></vs-th>
             </template>
 
             <template slot-scope="{ data }">
@@ -102,16 +121,28 @@
                   {{ index + 1 }}
                 </vs-td>
                 <vs-td>
-                  {{ item }}
+                  {{ item.filename }}
                 </vs-td>
                 <vs-td>
-                  <vs-button
-                    radius
-                    color="danger"
-                    type="filled"
-                    icon-pack="feather"
-                    icon="icon-trash-2"
-                  />
+                  <span class="flex">
+                    <vs-button
+                      @click="watchSampleVideo(item)"
+                      radius
+                      color="#82d4f5"
+                      type="filled"
+                      icon-pack="feather"
+                      icon="icon-eye"
+                    />
+                    &nbsp;
+                    <vs-button
+                      radius
+                      color="danger"
+                      type="filled"
+                      icon-pack="feather"
+                      icon="icon-trash-2"
+                      @click="removeVdo(item.v_id)"
+                    />
+                  </span>
                 </vs-td>
               </vs-tr>
             </template>
@@ -128,8 +159,13 @@
         @click.native="backToMain"
         >{{ $t("cancel") }}
       </vs-button>
-      <vs-button class="mt-4" type="filled" color="#ea4cc1">
-        {{ $t("upload") }}
+      <vs-button
+        class="mt-4"
+        type="filled"
+        color="success"
+        @click="createSchedule"
+      >
+        {{ $t("save") }}
       </vs-button>
     </div>
   </vx-card>
@@ -156,6 +192,8 @@ export default {
     selectTime: null,
     selectVideoData: {},
     selectedVideo: [],
+    sampleModal: false,
+    showVideo: null,
   }),
   mounted() {
     this.timeOption = this.timeSetting.timeData.map((x) => {
@@ -175,22 +213,53 @@ export default {
     removeFileList(index) {
       this.uploadList.splice(index, 1);
     },
-    test(test) {
-      console.log(test);
+    removeVdo(v_id) {
+      this.selectedVideo = this.selectedVideo.filter((x) => x.v_id != v_id);
+    },
+    async createSchedule() {
+      console.log(this.selectData);
+      console.log(this.timeSetting);
+      console.log(this.selectVideoData);
+      //filter empty time
+      let keys = Objects.keys(this.selectVideoData);
+      keys.map((x) => {
+        if (this.selectVideoData[x].length == 0) {
+          delete this.selectVideoData[x];
+        } else {
+          this.selectVideoData[x].map((x) => x.v_id);
+        }
+      });
+      let body = {
+        g_id: this.selectData.g_id,
+        date_start: this.timeSetting.fromDate,
+        date_end: this.timeSetting.toDate,
+        times: this.timeSetting.timeData,
+        videos: this.selectVideoData,
+      };
+      console.log(body);
+      
+    },
+    watchSampleVideo(item) {
+      this.showVideo = item;
+      this.sampleModal = true;
     },
     async uploadVideo() {
       let formData = new FormData();
       this.uploadList.forEach((x) => {
         formData.append("file", x);
       });
+      this.$store.dispatch("openLoading");
       let result = await this.postMethodWithFile(
         "/upload_video_multi2",
         formData,
         { g_id: this.selectData.g_id }
       );
+      this.$store.dispatch("closeLoading");
       debugger;
       if (!result.code) {
-        this.videoList = result.data;
+        this.getVdoArr();
+        this.uploadList = [];
+        // this.videoList = result.data;
       } else {
         this.$swal({
           title: this.$t(returnData.message + "_title"),
@@ -200,13 +269,41 @@ export default {
       }
       // this.videoList = this.uploadList.map((x) => x.name);
     },
+    async getVdoArr() {
+      try {
+        this.$store.dispatch("openLoading");
+        let result = await this.getMethod("/get_all_vms");
+        this.$store.dispatch("closeLoading");
+        if (result.code) {
+          return this.$swal({
+            title: this.$t("error"),
+            icon: "error",
+            text: result.message,
+          });
+        }
+        this.videoList = result.data;
+        console.log(result);
+      } catch (error) {
+        this.$swal({
+          title: this.$t("error"),
+          icon: "error",
+          text: error,
+        });
+      }
+    },
   },
   watch: {
     selectTime(val) {
+      this.getVdoArr();
       this.selectedVideo = this.selectVideoData[val];
     },
     selectedVideo(val) {
       this.selectVideoData[this.selectTime] = val;
+    },
+    sampleModal(val) {
+      if (!val) {
+        this.showVideo = null;
+      }
     },
   },
 };
