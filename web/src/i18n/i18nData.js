@@ -116,7 +116,9 @@ export default {
     upload_section: "ส่วนอัพโหลดวีดีโอ",
     video_selection: "ส่วนเลือกวีดีโอ",
     time_selected: "เลือกเวลา",
-    sample_video: "วีดีโอตัวอย่าง: {value}"
+    sample_video: "วีดีโอตัวอย่าง: {value}",
+    watch_sample: "ดูตัวอย่าง",
+    remove_from_select: "ลบออกจากที่เลือก"
   },
   en: {
     equipment_master_data: "Equipment Master Data",
@@ -234,6 +236,8 @@ export default {
     upload_section: "Upload Vided Section",
     video_selection: "Video selection",
     time_selected: "Select time",
-    sample_video: "Sample video : {value}"
+    sample_video: "Sample video : {value}",
+    watch_sample: "Watch sample",
+    remove_from_select: "Remove from selected"
   }
 };

@@ -18,11 +18,11 @@
         :class="classObj"
       >
         <!-- SM - OPEN SIDEBAR BUTTON -->
-        <!-- <feather-icon
+        <feather-icon
           class="sm:inline-flex xl:hidden cursor-pointer mr-1"
           icon="MenuIcon"
           @click.stop="showSidebar"
-        ></feather-icon> -->
+        ></feather-icon>
 
         <template v-if="breakpoint != 'md'">
           <!-- STARRED PAGES - FIRST 10 -->
@@ -87,7 +87,7 @@
           </div>
 
           <div class="bookmark-container">
-            <feather-icon
+            <!-- <feather-icon
               icon="StarIcon"
               :svgClasses="[
                 'stoke-current text-warning',
@@ -97,7 +97,7 @@
               @click.stop="
                 showBookmarkPagesDropdown = !showBookmarkPagesDropdown
               "
-            />
+            /> -->
             <div
               v-click-outside="outside"
               class="absolute bookmark-list w-1/3 xl:w-1/4 mt-4"

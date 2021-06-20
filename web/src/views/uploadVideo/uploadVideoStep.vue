@@ -125,6 +125,7 @@
                 </vs-td>
                 <vs-td>
                   <span class="flex">
+                    <vs-tooltip :text="$t('watch_sample')" position="top" >
                     <vs-button
                       @click="watchSampleVideo(item)"
                       radius
@@ -133,7 +134,9 @@
                       icon-pack="feather"
                       icon="icon-eye"
                     />
+                    </vs-tooltip>
                     &nbsp;
+                    <vs-tooltip :text="$t('remove_from_select')" position="top" >
                     <vs-button
                       radius
                       color="danger"
@@ -142,6 +145,7 @@
                       icon="icon-trash-2"
                       @click="removeVdo(item.v_id)"
                     />
+                    </vs-tooltip>
                   </span>
                 </vs-td>
               </vs-tr>
@@ -221,7 +225,7 @@ export default {
       console.log(this.timeSetting);
       console.log(this.selectVideoData);
       //filter empty time
-      let keys = Objects.keys(this.selectVideoData);
+      let keys = Object.keys(this.selectVideoData);
       keys.map((x) => {
         if (this.selectVideoData[x].length == 0) {
           delete this.selectVideoData[x];
