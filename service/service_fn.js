@@ -201,7 +201,7 @@ exports.delete_group_data = async (req, res) => {
 exports.get_group_with_video = async (req, res) => {
   try {
     // let sql = `SELECT gpms.g_id , g_name , last_config , time_create , ARRAY_AGG(vdoms.v_id) as v_list  FROM gpms LEFT JOIN vdoms ON gpms.g_id = vdoms.g_id GROUP BY gpms.g_id`
-    let sql = `SELECT gpms.g_id, gpms.g_name, vdo_arr, last_update FROM gpms LEFT JOIN gvdo ON gvdo.g_id = gpms.g_id`;
+    let sql = `SELECT  gpms.g_id, gpms.g_name FROM gpms `;
     let r1 = await pgcon.get(dbname, sql, config.connectionString());
     if (r1.code) {
       res.send({ code: true, message: r1.message });
@@ -744,12 +744,19 @@ exports.edit_user_password = async (req, res) => {
 exports.get_ads_data = async (req, res) => {
   try {
     let { g_id, start_date, end_date } = req.query;
-    let sql1 = `SELECT time_start , time_end , vdo_arr FROM gvdo WHERE g_id = '${g_id}' AND date_start = '${start_date}' AND date_end = '${end_date}'`;
+    let sql1 = `SELECT time_start as time_from  , time_end as time_to , vdo_arr FROM gvdo WHERE g_id = '${g_id}' AND date_start = '${start_date}' AND date_end = '${end_date}'`;
     let r1 = await pgcon.get(dbname, sql1, config.connectionString());
     if (r1.code) {
       res.send({ code: true, message: r1.message });
     } else {
-      res.send({ code: false, data: r1.data });
+      res.send({
+        code: false,
+        data: r1.data.map((x) => {
+          x.time_from = x.time_from.slice(0, 5);
+          x.time_to = x.time_to.slice(0, 5);
+          return x;
+        }),
+      });
     }
   } catch (error) {
     res.send({ code: true, message: error.message });
@@ -775,8 +782,10 @@ exports.save_ads_setting = async (req, res) => {
     let { g_id, date_start, date_end, times, videos } = req.body;
     let sqlArr = [];
     let dataArr = [];
-    sqlArr.push(`DELETE FROM gvdo WHERE g_id = $1`);
-    dataArr.push([g_id]);
+    sqlArr.push(
+      `DELETE FROM gvdo WHERE g_id = $1 AND date_start = $2 AND date_end = $3`
+    );
+    dataArr.push([g_id, date_start, date_end]);
     for (let time of times) {
       sqlArr.push(
         `INSERT INTO gvdo(g_id,date_start,date_end,time_start,time_end,vdo_arr,last_update) VALUES ($1,$2,$3,$4,$5,$6,NOW())`
@@ -785,9 +794,9 @@ exports.save_ads_setting = async (req, res) => {
         g_id,
         date_start,
         date_end,
-        time.fromDate,
-        time.toDate,
-        videos[`${time.fromDate}-${time.toDate}`],
+        time.time_from,
+        time.time_to,
+        videos[`${time.time_from}-${time.time_to}`],
       ]);
     }
     let r1 = await pgcon.inserttransactionwithData(
@@ -799,9 +808,67 @@ exports.save_ads_setting = async (req, res) => {
     if (r1.code) {
       res.send({ code: true, message: r1.message });
     } else {
-      res.send({ code: false});
+      res.send({ code: false });
     }
   } catch (error) {
     res.send({ code: true, message: error.message });
   }
+};
+
+exports.get_date_gvdo = async (req, res) => {
+  try {
+    let g_id = req.query["g_id"];
+    let sql = `SELECT date_start,date_end,time_start,time_end  FROM gvdo WHERE g_id = '${g_id}'`;
+    let r1 = await pgcon.get(dbname, sql, config.connectionString());
+    if (r1.code) {
+      res.send({ code: true, message: r1.message });
+    } else {
+      let result = [];
+      r1.data.forEach((data) => {
+        data.date_start = moment(data.date_start).format("YYYY-MM-DD");
+        data.date_end = moment(data.date_end).format("YYYY-MM-DD");
+        let index = result.findIndex(
+          (x) => x.date_start == data.date_start && x.date_end == data.date_end
+        );
+        if (index > -1) {
+          result[index].time.push({
+            time_start: data.time_start,
+            time_end: data.time_end,
+          });
+        } else {
+          result.push({
+            date_start: data.date_start,
+            date_end: data.date_end,
+            time: [{ time_start: data.time_start, time_end: data.time_end }],
+          });
+        }
+      });
+
+      res.send({ code: false, data: result });
+    }
+  } catch (error) {
+    res.send({ code: true, message: error.message });
+  }
+};
+
+exports.delete_ads_by_time = async (req, res) => {
+  try {
+    let { g_id, date_start, date_end } = req.body;
+    let sql1 = `DELETE FROM gvdo WHERE date_start = '${date_start}' AND date_end = '${date_end}' AND g_id = '${g_id}' `;
+    let r1 = await pgcon.execute(dbname, sql1, config.connectionString());
+    if (r1.code) {
+      res.send({ code: true, message: r1.message });
+    } else {
+      res.send({ code: false });
+    }
+  } catch (error) {
+    res.send({ code: true, message: error.message });
+  }
+};
+
+exports.get_vdo_at_time = async (req, res) => {
+  try {
+    let { g_id, date_start, date_end, start_time, end_time } = req.query;
+    let sql = `SELECT vdo_arr FROM gvdo  WHERE date_start = '${date_start}' AND date_end = '${date_end}' AND g_id = '${g_id}' AND time_start AND time_end`;
+  } catch (error) {}
 };

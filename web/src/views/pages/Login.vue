@@ -83,6 +83,7 @@ export default {
         });
         this.$store.dispatch("closeLoading");
       } else {
+        localStorage.setItem("userRole",result.role)
         this.$store.dispatch("updateUserRole", result.role);
         this.$store.dispatch("updateUserName", this.username);
         this.$store.dispatch("closeLoading");

@@ -7,6 +7,7 @@
         :selectData="selectData"
         :backToMain="backToMain"
         :nextStep="nextStep"
+        :toHome="toHome"
         v-model="timeSetting"
       />
       <upload-video-step
@@ -14,6 +15,7 @@
         :selectData="selectData"
         :backToMain="backToMain"
         :timeSetting="timeSetting"
+        :toHome="toHome"
       />
     </transition>
   </div>
@@ -45,6 +47,21 @@ export default {
     },
     nextStep() {
       this.pageState = 3;
+    },
+    toHome() {
+      this.pageState = 1;
+    },
+  },
+  watch: {
+    pageState(val) {
+      if (val == 1) {
+        this.selectData = {};
+        this.timeSetting = {
+          fromDate: null,
+          toDate: null,
+          timeData: [],
+        };
+      }
     },
   },
 };

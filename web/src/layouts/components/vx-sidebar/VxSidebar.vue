@@ -71,46 +71,48 @@
         >
           <template v-for="(sidebarItem, index) in sidebarItems">
             <!-- GROUP ITEM HEADER -->
-            <span
-              :key="`header-${index}`"
-              v-if="sidebarItem.header && !sidebarItemsMin"
-              class="navigation-header truncate"
-              >{{ sidebarItem.header }}</span
-            >
-            <template v-else-if="!sidebarItem.header">
-              <!-- IF IT'S SINGLE ITEM -->
-              <vx-sidebar-item
-                ref="sidebarLink"
-                :key="`sidebarItem-${index}`"
-                v-if="!sidebarItem.submenu"
-                :index="index"
-                :to="sidebarItem.slug != 'external' ? sidebarItem.url : ''"
-                :href="sidebarItem.slug == 'external' ? sidebarItem.url : ''"
-                :icon="sidebarItem.icon"
-                :target="sidebarItem.target"
-                :isDisabled="sidebarItem.isDisabled"
+            <template v-if="$acl.check(sidebarItem.acl)">
+              <span
+                :key="`header-${index}`"
+                v-if="sidebarItem.header && !sidebarItemsMin"
+                class="navigation-header truncate"
+                >{{ sidebarItem.header }}</span
               >
-                <span v-show="!sidebarItemsMin" class="truncate">{{
-                  $t(sidebarItem.name)
-                }}</span>
-                <vs-chip
-                  class="ml-auto"
-                  :color="sidebarItem.tagColor"
-                  v-if="sidebarItem.tag && (isMouseEnter || !reduce)"
-                  >{{ sidebarItem.tag }}</vs-chip
+              <template v-else-if="!sidebarItem.header">
+                <!-- IF IT'S SINGLE ITEM -->
+                <vx-sidebar-item
+                  ref="sidebarLink"
+                  :key="`sidebarItem-${index}`"
+                  v-if="!sidebarItem.submenu"
+                  :index="index"
+                  :to="sidebarItem.slug != 'external' ? sidebarItem.url : ''"
+                  :href="sidebarItem.slug == 'external' ? sidebarItem.url : ''"
+                  :icon="sidebarItem.icon"
+                  :target="sidebarItem.target"
+                  :isDisabled="sidebarItem.isDisabled"
                 >
-              </vx-sidebar-item>
+                  <span v-show="!sidebarItemsMin" class="truncate">{{
+                    $t(sidebarItem.name)
+                  }}</span>
+                  <vs-chip
+                    class="ml-auto"
+                    :color="sidebarItem.tagColor"
+                    v-if="sidebarItem.tag && (isMouseEnter || !reduce)"
+                    >{{ sidebarItem.tag }}</vs-chip
+                  >
+                </vx-sidebar-item>
 
-              <!-- IF HAVE SUBMENU / DROPDOWN -->
-              <template v-else>
-                <vx-sidebar-group
-                  ref="sidebarGrp"
-                  :key="`group-${index}`"
-                  :openHover="openGroupHover"
-                  :group="sidebarItem"
-                  :groupIndex="index"
-                  :open="isGroupActive(sidebarItem)"
-                ></vx-sidebar-group>
+                <!-- IF HAVE SUBMENU / DROPDOWN -->
+                <template v-else>
+                  <vx-sidebar-group
+                    ref="sidebarGrp"
+                    :key="`group-${index}`"
+                    :openHover="openGroupHover"
+                    :group="sidebarItem"
+                    :groupIndex="index"
+                    :open="isGroupActive(sidebarItem)"
+                  ></vx-sidebar-group>
+                </template>
               </template>
             </template>
           </template>
@@ -136,25 +138,25 @@ export default {
   props: {
     sidebarItems: {
       type: Array,
-      required: true
+      required: true,
     },
     title: {
-      type: String
+      type: String,
     },
     logo: {
-      type: String
+      type: String,
     },
     parent: {
-      type: String
+      type: String,
     },
     openGroupHover: {
       type: Boolean,
-      default: false
+      default: false,
     },
     reduceNotRebound: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   data: () => ({
     clickNotClose: false, // disable close sidebar on outside click
@@ -165,10 +167,10 @@ export default {
       // perfectscrollbar settings
       maxScrollbarLength: 60,
       wheelSpeed: 1,
-      swipeEasing: true
+      swipeEasing: true,
     },
     windowWidth: window.innerWidth, //width of windows
-    showShadowBottom: false
+    showShadowBottom: false,
   }),
   computed: {
     isSidebarActive: {
@@ -177,7 +179,7 @@ export default {
       },
       set(val) {
         this.$store.commit("TOGGLE_IS_SIDEBAR_ACTIVE", val);
-      }
+      },
     },
     reduceSidebar() {
       return Boolean(this.reduce && this.reduceButton);
@@ -188,18 +190,18 @@ export default {
       },
       set(val) {
         this.$store.commit("TOGGLE_REDUCE_BUTTON", val);
-      }
+      },
     },
     sidebarItemsMin() {
       return this.$store.state.sidebarItemsMin;
     },
     isGroupActive() {
-      return sidebarItem => {
+      return (sidebarItem) => {
         const path = this.$route.fullPath;
         let open = false;
-        let func = function(sidebarItem) {
+        let func = function (sidebarItem) {
           if (sidebarItem.submenu) {
-            sidebarItem.submenu.forEach(item => {
+            sidebarItem.submenu.forEach((item) => {
               if (path == item.url) {
                 open = true;
               } else if (item.submenu) {
@@ -211,7 +213,7 @@ export default {
         func(sidebarItem);
         return open;
       };
-    }
+    },
   },
   watch: {
     reduce(val) {
@@ -221,7 +223,7 @@ export default {
         this.$store.dispatch("updateSidebarWidth", "default");
       }
 
-      setTimeout(function() {
+      setTimeout(function () {
         window.dispatchEvent(new Event("resize"));
       }, 100);
     },
@@ -231,7 +233,7 @@ export default {
     $route() {
       if (this.isSidebarActive && this.showCloseButton)
         this.$store.commit("TOGGLE_IS_SIDEBAR_ACTIVE", false);
-    }
+    },
   },
   methods: {
     sidebarMouseEntered() {
@@ -294,12 +296,12 @@ export default {
     onSwipeRightSidebarSwipeArea() {
       if (!this.isSidebarActive && this.showCloseButton)
         this.isSidebarActive = true;
-    }
+    },
   },
   components: {
     VxSidebarGroup,
     VxSidebarItem,
-    VuePerfectScrollbar
+    VuePerfectScrollbar,
   },
   mounted() {
     this.$nextTick(() => {
@@ -309,7 +311,7 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleWindowResize);
-  }
+  },
 };
 </script>
 

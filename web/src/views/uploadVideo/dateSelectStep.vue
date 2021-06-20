@@ -28,12 +28,58 @@
           :disabled="dataState > 0"
         />
       </div>
-      <div class="vx-col flex-1 w-full" />
+      <div class="vx-col flex-1 w-full"></div>
+    </div>
+    <div class="flex vx-row mt-5" v-if="dateArr.length > 0">
+      <div class="vx-col w-full">
+        <vs-table stripe :data="dateArr">
+          <template slot="thead">
+            <vs-th>#</vs-th>
+            <vs-th>{{ $t("date_from") }}</vs-th>
+            <vs-th>{{ $t("date_to") }}</vs-th>
+            <vs-th>{{ $t("edit") }}</vs-th>
+            <vs-th>{{ $t("delete") }}</vs-th>
+          </template>
+          <template slot-scope="{ data }">
+            <vs-tr :data="item" :key="index" v-for="(item, index) of data">
+              <vs-td>
+                {{ index + 1 }}
+              </vs-td>
+              <vs-td>
+                {{ item.date_start }}
+              </vs-td>
+              <vs-td>
+                {{ item.date_end }}
+              </vs-td>
+              <vs-td>
+                <vs-button
+                  @click="selectEditTime(item)"
+                  radius
+                  color="warning"
+                  type="filled"
+                  icon-pack="feather"
+                  icon="icon-edit-2"
+                />
+              </vs-td>
+              <vs-td>
+                <vs-button
+                  radius
+                  color="danger"
+                  type="filled"
+                  icon-pack="feather"
+                  icon="icon-trash-2"
+                  @click="deleteDate(item)"
+                />
+              </vs-td>
+            </vs-tr>
+          </template>
+        </vs-table>
+      </div>
     </div>
     <template v-if="dataState > 0">
       <div class="flex vx-row mt-2">
         <div class="vx-col w-full">
-          <h5>{{ $t("select_time") }}</h5>
+          <h4>{{ $t("select_time" , {start:tempTimeSetting.fromDate,end:tempTimeSetting.toDate}) }}</h4>
         </div>
       </div>
       <div class="flex vx-row mt-5">
@@ -63,7 +109,7 @@
             color="success"
             type="filled"
             @click="addTimeitem"
-            >{{ $t("add") }}
+            >{{ $t("add_time") }}
           </vs-button>
         </div>
       </div>
@@ -106,7 +152,7 @@
           class="mt-4 shadow-lg"
           color="#bfbfbf"
           type="filled"
-          @click.native="backToMain"
+          @click.native="toHome"
           >{{ $t("cancel") }}
         </vs-button>
         &nbsp;
@@ -150,13 +196,17 @@ export default {
     nextStep: {
       type: Function,
     },
+    toHome:{
+      type:Function
+    }
   },
   data: () => ({
     dataState: 0,
     fromTime: null,
     toTime: null,
+    dateArr: [],
     configFromdateTimePicker: {
-      minDate: moment().subtract(1, "day").toDate(),
+      minDate: null,
       maxDate: null,
       locale: null,
     },
@@ -185,6 +235,7 @@ export default {
     if (this.tempTimeSetting.fromDate && this.tempTimeSetting.toDate) {
       this.dataState = 1;
     }
+    this.getDateData();
   },
   methods: {
     onFromChange(selectedDates, dateStr) {
@@ -200,6 +251,42 @@ export default {
       } else {
         this.$set(this.configTimeTo, "minTime", value2);
       }
+    },
+    deleteDate(item) {
+      this.$swal({
+        title: this.$t("confirm_delete_ads", {
+          start: item.date_start,
+          end: item.date_end,
+        }),
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: this.$t("confirm"),
+        cancelButtonText: this.$t("cancel"),
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+          return this.postMethod("/delete_ads_by_time", {
+            date_start: item.date_start,
+            date_end: item.date_end,
+            g_id: this.selectData.g_id,
+          })
+            .then((response) => {
+              console.log(response);
+              if (response) {
+                this.getDateData();
+              }
+            })
+            .catch((error) => {
+              console.error(errror);
+              this.$swal({
+                icon: "error",
+                title: this.$t("error"),
+                text: error.message,
+              });
+            });
+        },
+        allowOutsideClick: () => !this.$swal.isLoading(),
+      });
     },
     onTimetoChange(value1, value2) {
       this.$set(this.configTimeFrom, "maxTime", value2);
@@ -229,10 +316,15 @@ export default {
       this.$set(this.configTimeTo, "minTime", null);
       this.$set(this.configTimeFrom, "maxTime", null);
     },
+    selectEditTime(item){
+      this.tempTimeSetting.fromDate = item.date_start
+      this.tempTimeSetting.toDate = item.date_end
+    },
     deleteTime(index) {
       this.tempTimeSetting.timeData.splice(index, 1);
     },
     async nextState() {
+      console.log(this.dataState );
       if (this.dataState == 1) {
         this.nextStep();
       } else {
@@ -244,6 +336,7 @@ export default {
         });
         this.$store.dispatch("closeLoading");
         if (!r1.code) {
+          console.log(r1.data);
           this.tempTimeSetting.timeData = r1.data;
           this.dataState++;
         } else {
@@ -252,6 +345,19 @@ export default {
             title: this.$t("error"),
           });
         }
+      }
+    },
+    async getDateData() {
+      let result = await this.getMethod("/get_date_gvdo", {
+        g_id: this.selectData.g_id,
+      });
+      if (!result.code) {
+        this.dateArr = result.data;
+      } else {
+        this.$swal({
+          icon: "error",
+          title: this.$t("error"),
+        });
       }
     },
   },

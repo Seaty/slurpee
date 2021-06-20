@@ -57,6 +57,10 @@ app.post(
 app.post("/upload_video_multi2", service.upload_result);
 app.get("/get_ads_data", service.get_ads_data);
 app.get("/get_all_vms", service.get_all_vms);
+app.post("/save_ads_setting", service.save_ads_setting);
+app.get("/get_date_gvdo", service.get_date_gvdo);
+app.post("/delete_ads_by_time", service.delete_ads_by_time);
+app.get("/get_vdo_at_time", service.get_vdo_at_time);
 
 app.listen(port_service, () => {
   console.log("Start server with port " + port_service);

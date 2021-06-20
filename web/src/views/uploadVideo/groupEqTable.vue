@@ -1,5 +1,10 @@
 <template >
   <vx-card :title="$t('eq_group_with_video')">
+    <vs-popup
+      :title="$t('show_detail', { value: showDetail ? showDetail.g_name : '' })"
+      :active.sync="sampleModal"
+    >
+    </vs-popup>
     <div class="vx-row">
       <div class="vx-col w-full">
         <vs-table search stripe :data="groupData">
@@ -7,9 +12,8 @@
             <vs-th>#</vs-th>
             <vs-th>{{ $t("g_id") }}</vs-th>
             <vs-th>{{ $t("g_name") }}</vs-th>
-            <vs-th>{{ $t("video_count") }}</vs-th>
+            <!-- <vs-th>{{ $t("video_count") }}</vs-th> -->
             <vs-th>{{ $t("edit") }}</vs-th>
-            <!-- <vs-th>{{ $t("delete") }}</vs-th> -->
           </template>
 
           <template slot-scope="{ data }">
@@ -19,7 +23,7 @@
               </vs-td>
               <vs-td>{{ item.g_id }}</vs-td>
               <vs-td>{{ item.g_name }}</vs-td>
-              <vs-td>{{ item.v_list ? item.v_list.length : "-" }}</vs-td>
+              <!-- <vs-td>{{ item.v_list ? item.v_list.length : "-" }}</vs-td> -->
               <vs-td>
                 <vs-button
                   radius
@@ -30,16 +34,6 @@
                   @click.native="editState(item)"
                 />
               </vs-td>
-              <!-- <vs-td>
-                <vs-button
-                  radius
-                  color="danger"
-                  type="filled"
-                  icon-pack="feather"
-                  icon="icon-trash-2"
-                  @click="deleteVideo(item)"
-                />
-              </vs-td> -->
             </vs-tr>
           </template>
         </vs-table>
@@ -57,6 +51,8 @@ export default {
   },
   data: () => ({
     groupData: [],
+    sampleModal: false,
+    showDetail: {},
   }),
   created() {
     this.getGroupwithVideo();
@@ -73,7 +69,9 @@ export default {
         this.groupData = result.data;
       }
     },
-    async deleteVideo(value) {
+    async openDetail(item) {
+      this.showDetail = item;
+      this.sampleModal = true;
     },
   },
 };

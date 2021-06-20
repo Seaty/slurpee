@@ -7,8 +7,8 @@ class UserProvider extends HttpRequest {
 
     constructor() {
         // api api
-        // super('http://203.151.70.135:3007')
-        super('http://localhost:3007')
+        super('http://203.151.70.135:3007')
+        // super('http://localhost:3007')
     }
 
     async getMethod(fn_name, query) {

@@ -17,7 +17,8 @@ const mixin = {
       id: "deemapnigth"
     },
     deemapUrl: "https://www.deemap.com/DeeMap/gwc/service/wms",
-    host: "http://localhost:3007/"
+    host: "http://dtciot:3007/"
+    // host: "http://localhost:3007/"
   }),
   methods: {
     dateFormat(date) {

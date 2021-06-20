@@ -105,7 +105,7 @@ export default {
     time_start: "เวลาที่เริ่มเล่น",
     time_end: "เวลาที่หยุดเล่น",
     select_date: "เลือกวันที่",
-    select_time: "เลือกช่วงเวลา",
+    select_time: "เลือกช่วงเวลา  (ของ {start} - {end})",
     datetime_setting: "การตั้งค่าวันที่และเวลา (กลุ่ม {value})",
     upload_all: "อัพโหลดวีดีโอทั้งหมด",
     video_of_time: "วีดีโอของช่วงเวลาที่ : {time}",
@@ -118,7 +118,14 @@ export default {
     time_selected: "เลือกเวลา",
     sample_video: "วีดีโอตัวอย่าง: {value}",
     watch_sample: "ดูตัวอย่าง",
-    remove_from_select: "ลบออกจากที่เลือก"
+    remove_from_select: "ลบออกจากที่เลือก",
+    confirm_setting_ads: "ยืนยันการตั้งค่าโฆษณา",
+    video_selected: "วีดีโอที่เลือก",
+    no_search_result: "ไม่พบ {value}",
+    show_detail: "แสดงรายละเอียด : {value}",
+    confirm_delete_ads:
+      "ยืนยันการลบตารางเวลา (วันเริ่ม: {start} , วันสิ้นสุด:{end})",
+    add_time: "เพิ่มเวลา"
   },
   en: {
     equipment_master_data: "Equipment Master Data",
@@ -226,7 +233,7 @@ export default {
     time_start: "Time start",
     time_end: "Time end",
     select_date: "Select Date",
-    select_time: "Select Time",
+    select_time: "Select Time : (of {start} - {end})",
     datetime_setting: "Datetime Setting (group {value})",
     upload_all: "Upload All",
     video_of_time: "Video of time at : {time}",
@@ -238,6 +245,12 @@ export default {
     time_selected: "Select time",
     sample_video: "Sample video : {value}",
     watch_sample: "Watch sample",
-    remove_from_select: "Remove from selected"
+    remove_from_select: "Remove from selected",
+    confirm_setting_ads: "Confirm your setting advertising",
+    video_selected: "Video selected",
+    no_search_result: "Not found {value}",
+    show_detail: "Show detail : {value}",
+    confirm_delete_ads: "Confirm to delete ads (Start: {start} , End:{end})",
+    add_time: "Add time"
   }
 };
