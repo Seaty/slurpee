@@ -8,8 +8,8 @@ const multer = require("multer");
 const bcrypt = require("bcrypt");
 const secret_key =
   "p&p}F)!lJH5E-^yu]rCY$zT2lB0F451,0p@/R>a|Xf0SGGkAd>x_J7}-%L+j.Iu";
-// const startPath = `/var/www/html/slurpee/` // Real path
-const startPath = `./temp/`; // Test path
+const startPath = `/var/www/html/slurpee/` // Real path
+// const startPath = `./temp/`; // Test path
 
 exports.check_new_equipment = async (req, res, next) => {
   try {

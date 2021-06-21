@@ -9,7 +9,7 @@
       <div class="vx-row">
         <div class="vx-col w-full" v-if="sampleModal">
           <video width="100%" height="auto" controls>
-            <source :src="host + 'load_video_by_var2/' + showVideo.v_id" />
+            <source :src="getvideolink2(showVideo.v_id)" />
           </video>
         </div>
       </div>
@@ -178,6 +178,7 @@
           >{{ $t("back") }}
         </vs-button>
       </span>
+      &nbsp;
       <vs-button
         class="mt-4"
         type="filled"

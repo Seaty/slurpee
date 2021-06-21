@@ -25,41 +25,41 @@ export default [
     name: "dashboard",
     slug: "dashboard",
     icon: "HomeIcon",
-    acl: 'isPublic'
+    acl: '2'
   },
   {
     url: "/eqStatus",
     name: "equipment_status",
     slug: "equipment_status",
     icon: "AirplayIcon",
-    acl: 'isPublic'
+    acl: '2'
   },
   {
     url: "/eqRegis",
     name: "equipment_register",
     slug: "equipment register",
     icon: "HardDriveIcon",
-    acl: 'isPublic'
+    acl: '2'
   },
   {
     url: "/eqGrouping",
     name: "equipment_grouping",
     slug: "equipment Grouping",
     icon: "HardDriveIcon",
-    acl: 'isPublic'
+    acl: '2'
   },
   {
     url: "/uploadVideo",
     name: "upload_video_menu",
     slug: "upload_video_menu",
     icon: "VideoIcon",
-    acl: 'isPublic'
+    acl: '2'
   },
   {
     url: "/userManage",
     name: "user_manage",
     slug: "user_manage",
     icon: "UserIcon",
-    acl: 'isAdmin'
+    acl: '1'
   },
 ]

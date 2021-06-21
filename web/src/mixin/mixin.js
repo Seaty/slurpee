@@ -17,7 +17,7 @@ const mixin = {
       id: "deemapnigth"
     },
     deemapUrl: "https://www.deemap.com/DeeMap/gwc/service/wms",
-    host: "http://dtciot:3007/"
+    host: "http://203.151.70.135:3007"
     // host: "http://localhost:3007/"
   }),
   methods: {
@@ -85,6 +85,10 @@ const mixin = {
     },
     getvideolink(g_id, filename) {
       return `http://203.151.70.135:3007/load_video_by_var/${g_id}/${filename}`;
+      // return `http://localhost:3007/load_video_by_var/${g_id}/${filename}`
+    },
+    getvideolink2(filename) {
+      return `http://203.151.70.135:3007/load_video_by_var2/${filename}`;
       // return `http://localhost:3007/load_video_by_var/${g_id}/${filename}`
     },
     bgStatus(value) {

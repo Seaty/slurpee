@@ -53,7 +53,7 @@ const router = new Router({
           path: '/eqRegis',
           name: 'Equipment Register',
           meta: {
-            rule: 'isAdmin',
+            rule: 'isPublic',
             requiresAuth: true,
           },
           component: () => import('./views/EqRegister/EqRegister.vue')
@@ -62,7 +62,7 @@ const router = new Router({
           path: '/eqGrouping',
           name: 'Equipment Grouping',
           meta: {
-            rule: 'isAdmin',
+            rule: 'isPublic',
             requiresAuth: true,
           },
           component: () => import('./views/EqGrouping/eqGrouping.vue')
@@ -71,7 +71,7 @@ const router = new Router({
           path: '/uploadVideo',
           name: 'Upload Video',
           meta: {
-            rule: 'isAdmin',
+            rule: 'isPublic',
             requiresAuth: true,
           },
           component: () => import('./views/uploadVideo/uploadVideo.vue')
@@ -89,7 +89,7 @@ const router = new Router({
           path: '/userManage',
           name: 'User Manage',
           meta: {
-            rule: 'isAdmin',
+            rule: 'isPublic',
             requiresAuth: true,
           },
           component: () => import('./views/usesrManage/userManage.vue')

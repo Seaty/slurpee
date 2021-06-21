@@ -71,7 +71,7 @@
         >
           <template v-for="(sidebarItem, index) in sidebarItems">
             <!-- GROUP ITEM HEADER -->
-            <template v-if="$acl.check(sidebarItem.acl)">
+            <template v-if="checkRole(sidebarItem.acl)">
               <span
                 :key="`header-${index}`"
                 v-if="sidebarItem.header && !sidebarItemsMin"
@@ -296,6 +296,15 @@ export default {
     onSwipeRightSidebarSwipeArea() {
       if (!this.isSidebarActive && this.showCloseButton)
         this.isSidebarActive = true;
+    },
+    checkRole(check) {
+      let role = this.$store.state.userRole;
+      console.log(check == role);
+      if (role == "1") {
+        return true;
+      } else {
+        return check == role;
+      }
     },
   },
   components: {

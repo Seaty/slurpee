@@ -30,7 +30,7 @@
       </div>
       <div class="vx-col flex-1 w-full"></div>
     </div>
-    <div class="flex vx-row mt-5" v-if="dateArr.length > 0">
+    <div class="flex vx-row mt-5" v-if="dateArr.length > 0 && dataState == 0">
       <div class="vx-col w-full">
         <vs-table stripe :data="dateArr">
           <template slot="thead">
@@ -159,7 +159,7 @@
         <vs-button
           v-if="dataState > 0"
           class="mt-4 shadow-lg"
-          color="#c6e2ff"
+          color="#0057e3"
           type="filled"
           @click.native="previousState"
           >{{ $t("back") }}
